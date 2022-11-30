@@ -1,0 +1,58 @@
+
+-----------
+
+original.cpp: Here are some example inputs I ran:
+	
+	--------------------------------------------------
+	How many registered voters were surveyed? 23
+	How many of them say they will vote for Gavin? 13
+	How many of them say they will vote for Brian? 10
+	
+	56.5% say they will vote for Gavin.
+	43.5% say they will vote for Brian.
+	Gavin is predicted to win the election.
+	--------------------------------------------------
+	How many registered voters were surveyed? 50
+	How many of them say they will vote for Gavin? 25
+	How many of them say they will vote for Brian? 25
+
+	50.0% say they will vote for Gavin.
+	50.0% say they will vote for Brian.
+	Brian is predicted to win the election.	
+	--------------------------------------------------
+	How many registered voters were surveyed? 20
+	How many of them say they will vote for Gavin? 15
+	How many of them say they will vote for Brian? 13
+
+	75.0% say they will vote for Gavin.
+	65.0% say they will vote for Brian.
+	Gavin is predicted to win the election.
+	--------------------------------------------------
+
+I noticed that when Gavin and Brian have the same amount of votes (so the results of the election should be a tie), Brian is predicted to win the election. This appears to be a logical error in the program that happens because the else block runs whenever Gavin does not have more votes than Brian, which includes the case in which they have an equal amount of votes. Additionally, the program does not check that (forGavin + forBrian = numberSurveyed), which can lead to percentages adding up to greater than 100% if the user enters incorrect/illogical data.
+	
+-----------
+
+logic_error.cpp: I changed the greater than sign in line 30 to a less than sign. Now, whenever Gavin has fewer votes than Brain, Gavin is predicted to win the election; when Brian has fewer votes, Brian is predicted to win the election.  For example:
+
+	How many registered voters were surveyed? 30
+	How many of them say they will vote for Gavin? 21
+	How many of them say they will vote for Brian? 9
+
+	70.0% say they will vote for Gavin.
+	30.0% say they will vote for Brian.
+	Brian is predicted to win the election.
+	
+Although Gavin has a larger percentage of the votes, the program says "Brian is predicted to win the election." This is an incorrect conclusion because Gavin has more votes than Brian.
+
+-------
+
+complie_error.cpp: These are the two changes I made:
+
+1) I removed the "int" in from the forGavin declaration on line 11. This resulted in the 		following error on lines 11, 17, 21, and 32:
+	
+	Use of undeclared identifier 'forGavin'
+
+2) I changed the ">>" after "cin" on line 15 to "<<". This resulted in this error:
+
+	Invalid operands to binary expression ('std::istream' (aka 'basic_istream<char>') and 'int')

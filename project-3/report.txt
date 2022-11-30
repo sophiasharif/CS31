@@ -1,0 +1,132 @@
+(a)
+
+For me, coding isValidStateForecast was more difficult. I found it difficult to get started with structuring the loop to check that each party result is valid. Additionally, there were so many distinct ways that poll strings could go wrong, and it was difficult to try and think through all those. For example, I realized after a bit of testing that my main loop did not account for random spaces or special characters in the poll string, so I decided to write a separate loop to check for that at the beginning. It was also difficult to write test cases for the same reason - there are so many ways the input could be invalid. Eventually, I found that closely reading the definitions in the spec and figuring out every way I could violate was most productive for creating test cases.
+
+(b)
+
+---isValidPollString---
+
+I created a helper function isValidStateForecast, which takes a string and output true if it is a valid state forecast, to help me organize my code. Here is the pseudocode for isValidStateForecast:
+
+...
+if the forecast is fewer than 2 letters, return false
+if there are any chars aside from digit and numbers, return false
+if the state code is not valid, return false
+if the last char is not a letter, return false
+for each party result:
+    check the first one or two chars are digits
+    check the next char after a digit is a letter
+...
+
+This function does the bulk of the work for isValidPollString. The overall structure of isValidPollString is to isolate all the substrings between commas and pass them to isValidStateForecast. Here is the pseudocode:
+
+...
+if the forecast is the empty string, return true
+if the first and last chars are not letters, return false
+for each char:
+    accumulate chars into a substring until you find a comma
+    if the substring is not a valid state forecast:
+        return false
+...
+
+The purpose of checking that the first and last char are letters is to ensure that there are no commas at the beginning or end of the string. 
+
+
+--- countSeats ---
+
+Similar to isValidPollString, I created a helper function to process the individual state forecasts. This function, processStateForecast, takes the inputs of a state forecast and a party and returns how many seats that party won. The function assumes the state forecast and party are both valid. This is the pseudocode:
+
+...
+totalSeats = 0
+
+for each char:
+    if the char matches the party:
+        if the previous two chars are both digits:
+            add the two-digit number to totalSeats
+        otherwise:
+            add just the previous digit to totalSeats
+...
+
+With this function, the code for countSeats becomes pretty simple. After the checks for invalid inputs, the function just sends every substring between commas to processStateForecast and tallies up the party seats for each state forecast. Here is the pseudocode:
+
+...
+if pollData is invalid, return 1
+if party is not a letter, return 2
+
+tally = 0
+
+repeatedly:
+    save chars of pollData into a variable until you reach a comma
+    send saved substring into processStateForecast, add result to tally
+
+save tally to seatCount, return 0
+...
+
+
+
+(c)
+
+// TEST CASES FOR isValidStateForecast
+
+    // VALID GIVEN FORECASTS
+    assert(isValidStateForecast("CT5D"));
+    assert(isValidStateForecast("ne3r00D"));
+    assert(isValidStateForecast("NY9R16D1I"));
+    assert(isValidStateForecast("NJ3D5R4D"));
+    assert(isValidStateForecast("VT"));
+
+    // INVALID FORECASTS
+    assert(!isValidStateForecast("KS 4R"));     // space in middle
+    assert(!isValidStateForecast("ga4 r"));     // space in middle
+    assert(!isValidStateForecast("nj 43d"));    // space in middle
+    assert(!isValidStateForecast("ma43f6 3f")); // space in middle
+    assert(!isValidStateForecast(" ga4r"));     // space at start
+    assert(!isValidStateForecast("ga4r "));     // space at end
+    assert(!isValidStateForecast("m34f45r"));   // invalid state code
+    assert(!isValidStateForecast("mg32d"));     // invalid state code
+    assert(!isValidStateForecast("wa3/34f"));   // includes special character
+    assert(!isValidStateForecast("wa2"));       // last party result is invalid
+    assert(!isValidStateForecast("ca3f32"));    // last party result is invalid
+    assert(!isValidStateForecast("mD3d3/"));    // last party result is invalid
+    assert(!isValidStateForecast(""));          // empty string
+    assert(!isValidStateForecast(" "));         // just a space
+    assert(!isValidStateForecast("m"));         // single letter
+
+// TEST CASES FOR isValidPollString
+
+    // VALID POLL STRINGS
+    assert(isValidPollString("CT5D,NY9R16D1I,VT,ne3r00D"));
+    assert(isValidPollString("cA"));
+    assert(isValidPollString("ca,wa,md"));
+    assert(isValidPollString("cA3d5r34w,ny5g23h6h,vt"));
+    assert(isValidPollString(""));
+    assert(isValidPollString("CT"));
+    assert(isValidPollString("ct"));
+
+    // INVALID POLL STRINGS
+    assert(!isValidPollString(" "));                             // just a space
+    assert(!isValidPollString("m"));                             // one letter
+    assert(!isValidPollString(",CT5D,NY9R16D1I,VT,ne3r00D"));    // first char is comma
+    assert(!isValidPollString("ca,"));                           // last char is comma
+    assert(!isValidPollString("T5D,NY9R16D1I,VT,ne3r00"));       // ends in digit
+    assert(!isValidPollString("CT5D,NY9R16D1I,VT,ne3r00D, ca")); // contains space
+    assert(!isValidPollString("CT5D,NY9R16D1I,,VT,ne3r00D"));    // two commas in a row
+    assert(!isValidPollString(","));                             // just a comma
+
+
+// TEST CASES FOR processStateForecast
+    assert(processStateForecast("ca5d4d", 'd') == 9);
+    assert(processStateForecast("ca50d4d", 'd') == 54);
+    assert(processStateForecast("ca4r4i", 'd') == 0);
+    assert(processStateForecast("ca4d4D", 'd') == 8); 		// mixed upper & lower letters
+    assert(processStateForecast("ca", 'd') == 0);     		// no party results at all
+
+// TEST CASES FOR countSeats
+    int seats = -999;
+    assert(countSeats("ca32d", '/', seats) == 2); assert(seats == -999);  		// invalid party
+    assert(countSeats("cf32d", 'd', seats) == 1); assert(seats == -999);		// invalid poll string
+    assert(countSeats("ca4d4D", 'D', seats) == 0); assert(seats == 8); 		// two D parties
+    assert(countSeats("CT5D,NY9R16D1I,VT,ne3r00D", 'D', seats) == 0); assert(seats == 21);
+    assert(countSeats("CT5D,NY9R16D1I,VT,ne3r00D", 'r', seats) == 0); assert(seats == 12);
+    assert(countSeats("CT5D,NY9R16D1I,VT,ne3r00D", 'i', seats) == 0); assert(seats == 1);
+    assert(countSeats("", 'D', seats) == 0); assert(seats == 0);			// empty string

@@ -1,0 +1,22 @@
+(a)
+
+The most difficult part of this assignment was calculating the tax on income in the least convoluted way possible. For example, I thought a little bit about the best way to change the second bracket's tax if the occupation is "nurse" or "teacher." Instead of creating an extra if statement, I decided to just change the value of the SECOND_BRACKET_TAX variable if the occupation input was one of those two professions.
+
+(b)
+
+Negative # of children (bob Joe, 32.12, chef, -3)
+Negative tax due to children (bob, 50, plumber, 5)
+Empty name ( , 84, firefighter, 0)
+Empty occupation (Amy, 11111, , 4)
+Negative income (Amy, -3000, doctor, 4)
+No child tax when income is over $125000 (Amy, 300000, doctor, 8)
+Edge case: income is 125000:
+	No children or special occupation (Joe blow, 125000, doctor, 0)
+	Has children, but no special occupation(Joe blow, 125000, doctor, 5)
+	Has special occupation, but no children(Joe blow, 125000, teacher, 0)
+	Has special occupation and children(Joe blow, 125000, nurse, 5)
+Edge case: income is 55000
+	No children or special occupation (Joe blow, 55000, doctor, 0)
+	Has children, but no special occupation (Joe blow, 55000, doctor, 10)
+	Has special occupation, but no children (Joe blow, 55000, nurse, 0)
+	Has special occupation and children (Joe blow, 55000, nurse, 10)

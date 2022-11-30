@@ -1,0 +1,62 @@
+(1)
+
+I found the most difficult part of this project to be the implementation of the algorithm that calculates how many gold and silver matches are in two words. At first, I tried to implement the algorithm by parsing through and looking for golds, and then looking for silvers by looking for the same chars in different positions. However, I realized that this method can double-count letters as both gold and silver matchings. To solve this issue, I started thinking of matches as pairs of letters. If a letter is found to be part of a match, the program changes it to be a non-letter character so it cannot be counter for another matching again.
+
+(2)
+
+Here is the structure for my main routine. It contains the statistics for the entire game, while the specifics of any one round are delegated to playOneRound. In essence, it just checks if the inputs are valid, gets the number of rounds the user wants to play, then calls playOneRound() repeatedly and calculates stats.
+
+===========================
+main:
+
+if word list does not have any words:
+	end program
+get total rounds
+check total rounds is a positive number
+repeatedly:
+	output round and hidden word info
+	playOneRound() (see below)
+	output score
+	calculate stats (if it is the first round, establish the stats)
+	output stats
+===========================
+
+Most of the logic is contained in playOneRound. The job of playOneRound is to get a probe word, check if it is valid, and then calculate the golds and silvers. The input checking is partially delegated to the functions containsWord and isLowercaseWord. The gold and silver algorithm involves treating letters as pairs and changing letters to non-letter characters to prevent double counting in other pairs.
+
+===========================
+playOneRound:
+
+if params are invalid, return -1
+repeatedly:
+	get probe word
+	check if probe word matches guess
+	check if probe word is valid (uses isLowerCase & containsWord functions, see below)
+	calculate golds & silvers:
+		loop 1 (golds): 
+			iterate through chars of probe word
+			if chars in position n are the same in probe & hidden word,:
+				increment golds
+				change value of both chars (to avoid double counting)
+		loop 2 (silvers):
+			if current char in probe word appears in hidden word:
+				increment silvers
+				change value of chars
+	increment numGuesses
+===========================
+
+The following two functions are helper functions for playOneRound; both help check if an input probe word is valid. They both work in a similar manner. They iterate through elements in an array, and if they find one that does not match, they return false/true. Otherwise, they return the opposite.
+
+===========================
+containsWord
+for each word in input array:
+	if input word matches array word:
+		return true
+
+isLowercaseWord
+for each char in input c string
+	if char is not a lowercase letter
+		false false
+===========================
+
+	
+	

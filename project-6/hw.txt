@@ -1,0 +1,181 @@
+QUESTION 1
+
+(a)
+int main(int argc, const char * argv[]) {
+    int arr[3] = { 5, 10, 15 };
+    int* ptr = arr;
+
+    *ptr = 30;          // set arr[0] to 30
+    *(ptr + 1) = 20;      // set arr[1] to 20
+    ptr += 2;
+    *ptr = 10;        // set arr[2] to 10
+    
+    ptr -= 2;
+    while (ptr <= arr+2)
+    {
+        cout << *ptr << endl;    // print values
+        ptr++;
+    }
+}
+
+(b)
+
+The issue is that the code in main() assumes that ptr is passed by reference, when findMax()’s third parameter is actually passed by value. To fix this, we just need to declare pToMax as a parameter passed by reference. Here is the fixed code - I just added a “&” between “int*” and “pToMax”:
+
+void findMax(int arr[], int n, int*& pToMax)
+
+
+(c)
+In main(), ptr is initialized, so it could be pointing anywhere in memory. Calling computeCube() on an unitialized pointer leads undefined behavior. To fix this, we can initialize an integer “a” and define ptr to point to a:
+
+  int main()
+  {
+      int a;
+      int* ptr = &a;
+      computeCube(5, ptr);
+      cout << "Five cubed is " << *ptr << endl;
+  }
+
+(d) There are a few problems here:
+	
+	1. Throughout the program, the pointers str1 and str2 are used instead of the values that they point to, *str1 and *str2. These need to be switched in the following places:
+		a) “while (str1 != 0 && str2 != 0)” — We are interested in the cases in which the values str1 and str2 point to are 0, not the memory locations themselves.
+		b) “if (str1 != str2)” — unless we pass in the same array as str1 and str 2, the two memory locations they point to will never be the same.  Instead, we are interested in the values they point to.
+		c) “return str1 == str2” — as in B, the two memory locations will never be the same unless we pass in the same array. 
+
+The fixed program looks like this:
+
+// return true if two C strings are equal
+ bool strequal(const char str1[], const char str2[])
+ {
+
+     while (*str1 != 0  &&  *str2 != 0)  // zero bytes at ends
+     {
+         if (*str1 != *str2)  // compare corresponding characters
+             return false;
+         str1++;            // advance to the next character
+         str2++;
+     }
+     return *str1 == *str2;   // both ended at same time?
+ }
+
+ int main()
+ {
+     char a[15] = "Chang";
+     char b[15] = "Zhang";
+
+     if (strequal(a,b))
+         cout << "They're the same person!\n";
+
+
+(e) The array in getPtrToArray() is initialized within the scope of the function, not globally. Because of this, after the function executes, the program has to reason to think it should preserve those memory locations for the array declared in getPtrToArray(). Because of this, the program reassigns those memory for the junk array in the f() function.
+
+QUESTION 2
+
+a. double* cat;
+b. double mouse[5];
+c. cat = mouse + 4;
+D. *cat=25;
+E. *(mouse+3) = 54;
+F. cat -= 3;
+G. cat[1]= 42;
+H. cat[0] = 17;
+I. bool d = (cat == mouse);
+J. bool b = (*cat == *(cat + 1));
+
+
+QUESTION 3
+
+(a)
+double mean(const double* scores, int numScores)
+{
+    int i = 0;
+    double tot = 0;
+    while (i != numScores)
+    {
+        tot += *(scores+i);
+        i++;
+    }
+    return tot/numScores;
+}
+
+(b)
+const char* findTheChar(const char* str, char chr)
+{
+    for (int k = 0; *(str+k) != 0; k++)
+        if (*(str+k) == chr)
+            return (str+k);
+
+    return nullptr;
+}
+
+(c)
+const char* findTheChar(const char* str, char chr)
+{
+    while (*str != '\0') {
+        if (*str == chr)
+            return str;
+        str++;
+    }
+
+    return nullptr;
+}
+
+QUESTION 4
+
+To start, I’ll explain what each of the functions do. All three functions take the pointers a and b as parameters, but each do different things.
+	maxwell: If the value a points to is greater than b, the function returns a. If the value b points to is greater than or equal to the value a points to, the function returns b.
+	swap1: Because there is no dereference syntax (*), this function swaps the location in memory a and b point to (which as a result also swaps the values of *a and *b). However, each value stays at its original location in memory.
+	swap 2: Because of the *s in front of the pointer, this pointer only swaps the values a and b point to. The location in memory they point to stays the same.
+
+Now that we’ve established what the functions do, we can analyze main():
+
+
+int main()
+    {
+        int array[6] = { 5, 3, 4, 17, 22, 19 };
+
+        int* ptr = maxwell(array, &array[2]); // “array” points to 5 and “&array[2]” points to 4. 5>4 so ptr = array, which means ptr points to the first value in the array.
+        *ptr = -1; // sets the first value of the array to -1. 
+        ptr += 2; // ptr now points to the third element of array.
+        ptr[1] = 9; // ptr[1] refers to the fourth elem in the array, so array[3] = 9.
+        *(array+1) = 79; // array + 1 is the second elem of the array, so array[1] = 79.
+
+        cout << &array[5] - ptr << endl; // &array[5] refers to the sixth elem in the array and ptr points to the third elem, so this outputs 3.
+
+        swap1(&array[0], &array[1]); // swap1 swaps the locations in memory two pointers refer to, but since &array[0] and &array[1] are not saved to a variable this line does not have any effect.
+        swap2(array, &array[2]); // this swaps the values of elements 0 and 2.
+
+        for (int i = 0; i < 6; i++) // this prints out each elem of the array
+            cout << array[i] << endl;
+    }  // per the explanations above, this leads to the following total output:
+3
+4
+79
+-1
+9
+22
+19
+
+QUESTION 5
+
+void removeS(char* c) {
+    char* p;
+    for (; *c != '\0'; c++) { // iterate through each char in the string
+        while (*c == 's' || *c == 'S') { // while c is s, bring all the characters forward.
+            for (p = c; *p != '\0'; p++) {
+                *p = *(p+1);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
